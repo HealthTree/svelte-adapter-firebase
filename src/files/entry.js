@@ -19,6 +19,8 @@ export default async function svelteKit(request, response) {
 	const rendered = await server.respond(toSvelteKitRequest(request));
 	const body = await rendered.text();
 
+	// TODO : we need this because we are using two domains in parallel and we access the session.host
+	rendered.headers['cache-control'] = rendered.headers['cache-control']?.replace('private','pubic');
 	return rendered
 		? response.writeHead(rendered.status, rendered.headers).end(body)
 		: response.writeHead(404, 'Not Found').end();
