@@ -16,12 +16,20 @@ const server = new Server(manifest);
  * @returns {Promise<void>}
  */
 export default async function svelteKit(request, response) {
-	const rendered = await server.respond(toSvelteKitRequest(request));
-	const body = await rendered.text();
+	const rendered = await app.render(toSvelteKitRequest(request));
 
 	// TODO : we need this because we are using two domains in parallel and we access the session.host
 	rendered.headers['cache-control'] = rendered.headers['cache-control']?.replace('private','pubic');
 	return rendered
 		? response.writeHead(rendered.status, rendered.headers).end(body)
 		: response.writeHead(404, 'Not Found').end();
+	if (rendered) {
+		// TODO : we need this because we are using two domains in parallel and we access the session.host
+		rendered.headers['htfun'] = 'htfun'
+		rendered.headers['cache-control'] = rendered.headers['cache-control']?.replace('private', 'pubic');
+		console.log(rendered.headers);
+		response.writeHead(rendered.status, rendered.headers).end(rendered.body)
+	} else {
+		response.writeHead(404, 'Not Found').end();
+	}
 }
