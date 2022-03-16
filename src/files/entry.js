@@ -24,14 +24,16 @@ export default async function svelteKit(request, response) {
 
 	if (rendered) {
 		// TODO : we need this because we are using two domains in parallel and we access the session.host
-		if (rendered.headers?.get && rendered.headers?.set) {
-			rendered.headers.set('cache-control', rendered.headers.get('cache-control').replace('private', 'pubic'));
-		} else {
-			rendered.headers['cache-control'] = rendered.headers['cache-control']?.replace('private', 'pubic');
-		}
+    if (rendered.headers?.get?.('cache-control') || rendered.headers['cache-control']) {
+      if (rendered.headers?.get && rendered.headers?.set) {
+        rendered.headers.set('cache-control', rendered.headers.get('cache-control')?.replace('private', 'pubic'));
+      } else {
+        rendered.headers['cache-control'] = rendered.headers['cache-control']?.replace('private', 'pubic');
+      }
+    }
 		console.log(rendered.headers);
-		response.writeHead(rendered.status, rendered.headers).end(rendered.body);
+		return response.writeHead(rendered.status, rendered.headers).end(rendered.body);
 	} else {
-		response.writeHead(404, 'Not Found').end();
+		return response.writeHead(404, 'Not Found').end();
 	}
 }
