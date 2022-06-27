@@ -18,11 +18,8 @@ const server = new Server(manifest);
 export default async function svelteKit(request, response) {
   const rendered = await server.respond(toSvelteKitRequest(request));
   const body = await rendered.text();
+
   return rendered
     ? response.writeHead(rendered.status, Object.fromEntries(rendered.headers.entries())).end(body)
     : response.writeHead(404, 'Not Found').end();
 }
-
-
-
-
